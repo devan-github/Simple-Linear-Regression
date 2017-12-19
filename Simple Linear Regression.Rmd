@@ -1,0 +1,124 @@
+---
+title: " Simple Linear Regression"
+author: "Devan Goto"
+date: "November 30, 2017"
+output: html_document
+---
+
+```{r}
+#Import Datasets
+
+A1<-read.csv("/Users/Devan/Desktop/Practice Datasets/random-linear-regression/train.csv",header = TRUE, sep = ",")
+
+B1<-read.csv("/Users/Devan/Desktop/Practice Datasets/random-linear-regression/test.csv",header = TRUE, sep = ",")
+
+library(dplyr)
+
+```
+
+```{r}
+#Data Cleaning
+
+#Delete na and blank values
+A2<-A1[complete.cases(A1), ]
+
+#Delete na and blank values
+B2<-B1[complete.cases(B1), ]
+
+```
+
+```{r}
+
+#Identify & delete outliers
+
+boxplot(A2$x, main='Ind. Var.', sub=paste('Outliers = ', boxplot.stats(A2$x)$out))
+
+boxplot(A2$y, main='Dep. Var. Boxplot', sub=paste('Outliers = ', boxplot.stats(A2$y)$out))
+
+#No data points are outside of the whiskers.  Thus there are no outliers. 
+
+#for test data
+boxplot(B2$x, main='Ind. Var.', sub=paste('Outliers = ', boxplot.stats(B2$x)$out))
+
+boxplot(B2$y, main='Dep. Var. Boxplot', sub=paste('Outliers = ', boxplot.stats(B2$y)$out))
+
+```
+
+```{r}
+
+#Assumption Test 1 (Linearity of x & y)
+
+#correlation
+cor(A2$x, A2$y)
+[1] 0.9953399 #This indicates that there is a near perfect linear relationship between x & y.  As x increases so does y. 
+
+#Scatterplot
+scatter.smooth(x=A2$x, y=A2$y, main="Scatter Plot For X & Y")
+
+#for test data
+cor(B2$x, B2$y)
+[1] 0.9945453
+
+scatter.smooth(x=B2$x, y=B2$y, main="Scatter Plot For X & Y")
+
+```
+
+```{r}
+#Linear Regression
+
+linear1 <- lm(y ~ x, data=A2)
+summary(linear1)
+
+```
+
+```{}
+#Linear1 Outputs
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.107265   0.212170  -0.506    0.613    
+x            1.000656   0.003672 272.510   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.809 on 697 degrees of freedom
+Multiple R-squared:  0.9907
+
+```
+
+```{r}
+
+#Understand Outputs of Linear Regression
+
+#As X increases by 1 unit, y increases by about the same
+
+#Accuracy of X's coefficient is very high
+
+#P-value tells us to reject the null hypothesis. Our predictor is most likely to be the reason for the change in y. Our p-value is lower than 0.05. 
+
+
+##Null Hypothesis= A null hypothesis is a hypothesis that says there is no statistical significance between the two variables in the hypothesis (x has no effect on y). 0.05 (p-value) is usually aceptable to reject the null.
+
+
+#Our R-squared value shows that the model fits the data well. 
+
+##R-Squared: The proportion of variation in the dependent variable(s) that have been explained by the model. 
+##In general, the higher the R-squared, the better the model fits your data
+
+#Small average error in residuals: 2.809
+
+```
+
+```{r}
+
+#Check Assumptions
+
+#R has built in regression diagnostic plots. Use plot function for linear regression model. 
+
+plot(linear1)
+
+#First plot is a residual plot. x-axis predicted. y-axis residuals/errors. ##Linearity is met because there is no pattern (line is flat). This plot also shows that variation is constant. Meets assumption of linearity & homoscedasticity.
+
+#Plot 2 (Q-Q Plot: Quantile Quantile Plot): y-axis: ordered observed standarized residuals. x-axis: ordered theoretical residuals (what you would expect residuals to be if the errors/residuals are normally distributed).  ##If residuals are normally distributed they should roughly be on a diagnoal line. Meets assumption of normality.
+
+```
